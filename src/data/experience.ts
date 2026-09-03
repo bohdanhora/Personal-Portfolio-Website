@@ -8,7 +8,7 @@ export const companies: Company[] = [
   {
     name: "Computools",
     period: "Oct 2023 to present",
-    location: "Austria",
+    location: "Ukraine",
     arrangement: "Remote",
     roles: [
       {

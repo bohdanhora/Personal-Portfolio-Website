@@ -24,8 +24,7 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-const description =
-  "Full-Stack Software Engineer based in Austria. TypeScript across the stack: React and Next.js interfaces, NestJS and Fastify services, PostgreSQL, MongoDB and Redis.";
+const description = `${profile.title} based in ${profile.location}. TypeScript across the stack: React and Next.js interfaces, NestJS and Fastify services, PostgreSQL, MongoDB and Redis.`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
