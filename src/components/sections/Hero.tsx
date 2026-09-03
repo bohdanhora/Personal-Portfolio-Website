@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
 import { useRef } from "react";
+import { DownloadCv } from "@/components/ui/DownloadCv";
 import { profile } from "@/data/profile";
 
 const nameWords = profile.name.split(" ");
@@ -75,22 +76,26 @@ export function Hero() {
           </dl>
         </div>
 
-        <ul
-          className="animate-fade-up mt-12 flex flex-wrap items-center gap-x-8 gap-y-3"
+        <div
+          className="animate-fade-up mt-12 flex flex-wrap items-center gap-x-10 gap-y-5"
           style={{ animationDelay: "0.6s" }}
         >
-          {links.map((link) => (
-            <li key={link.label}>
-              <a
-                href={link.href}
-                {...(link.external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
-                className="link-underline text-sm text-ink transition-colors hover:text-accent"
-              >
-                {link.label}
-              </a>
-            </li>
-          ))}
-        </ul>
+          <DownloadCv />
+
+          <ul className="flex flex-wrap items-center gap-x-8 gap-y-3">
+            {links.map((link) => (
+              <li key={link.label}>
+                <a
+                  href={link.href}
+                  {...(link.external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
+                  className="link-underline text-sm text-ink transition-colors hover:text-accent"
+                >
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </motion.div>
 
       <div

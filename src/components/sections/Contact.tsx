@@ -1,3 +1,4 @@
+import { DownloadCv } from "@/components/ui/DownloadCv";
 import { profile } from "@/data/profile";
 import { Reveal } from "@/components/ui/Reveal";
 import { Section } from "@/components/ui/Section";
@@ -25,7 +26,11 @@ export function Contact() {
         </a>
       </Reveal>
 
-      <Reveal delay={0.12}>
+      <Reveal delay={0.1}>
+        <DownloadCv className="mt-10" />
+      </Reveal>
+
+      <Reveal delay={0.14}>
         <dl className="mt-14 grid gap-8 border-t border-rule pt-8 sm:grid-cols-3">
           {channels.map((channel) => (
             <div key={channel.label}>
