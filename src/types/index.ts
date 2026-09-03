@@ -9,6 +9,11 @@ export type SocialLink = {
   handle: string;
 };
 
+export type Fact = {
+  label: string;
+  value: string;
+};
+
 export type Profile = {
   name: string;
   title: string;
@@ -16,6 +21,7 @@ export type Profile = {
   availability: string;
   intro: string[];
   about: string[];
+  facts: Fact[];
   email: string;
   links: {
     linkedin: SocialLink;

@@ -10,9 +10,15 @@ export const profile: Profile = {
     "React and Next.js on the front, NestJS and Fastify on the back, with PostgreSQL, MongoDB and Redis underneath.",
   ],
   about: [
-    "I started in 2021 with Vue and spent my first years on frontend work: reusable components, dashboards, forms, live data. A migration from Vue to React on a trading platform is what moved me over to React, and it stayed my main tool for the next two years.",
-    "Since then the work has kept moving down the stack. On a healthcare product I owned complex, data-heavy screens and the typed contracts behind them. Now most of my time goes into backend services with NestJS and Fastify, plus full-stack features on a document editing platform where the editor, the database and the model responses all have to agree with each other.",
-    "The products I enjoy most are the ones with real constraints: state that has to stay correct, data that arrives out of order, screens people sit in front of for hours. I am based in Ukraine and work remotely with Computools.",
+    "I came into frontend through Vue in 2021, and the work has been drifting backwards through the stack ever since.",
+    "The first couple of years were dashboards and forms with live data behind them, which sounds duller than it was. Then the crypto platform I worked on got rebuilt in React, I did a large part of that migration, and React has been my main tool since.",
+    "A year on a surgical planning product convinced me that the hard parts of a frontend are rarely the visual ones. It was validation that changed depending on three other fields, tables nobody could fit on a screen, print output that had to line up with what the user was looking at. These days I write more backend than frontend: NestJS, Fastify, Postgres, and the caching and background jobs that sit around them.",
+    "What I look for is work where almost correct is not good enough. So far that has meant money and medical planning. I live in Ukraine and work remotely with Computools.",
+  ],
+  facts: [
+    { label: "Commercial since", value: "2022" },
+    { label: "Now", value: "Backend and full-stack at Computools" },
+    { label: "Core", value: "TypeScript, React, Node.js, PostgreSQL" },
   ],
   email: "bohdan.hora.developer@gmail.com",
   links: {
