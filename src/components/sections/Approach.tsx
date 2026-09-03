@@ -8,9 +8,9 @@ export function Approach() {
       <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2">
         {approach.map((item, index) => (
           <Reveal key={item.title} delay={0.05 * (index % 2)}>
-            <article>
-              <h3 className="font-serif text-[1.0625rem] leading-snug text-ink">{item.title}</h3>
-              <p className="mt-2.5 text-sm leading-relaxed text-ink-muted">{item.body}</p>
+            <article className="border-t border-rule pt-5">
+              <h3 className="font-serif text-lg leading-snug tracking-tight">{item.title}</h3>
+              <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-muted">{item.body}</p>
             </article>
           </Reveal>
         ))}

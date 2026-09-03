@@ -1,5 +1,6 @@
 import { profile } from "@/data/profile";
 import { Reveal } from "@/components/ui/Reveal";
+import { Section } from "@/components/ui/Section";
 
 export function Contact() {
   const channels = [
@@ -8,58 +9,45 @@ export function Contact() {
   ];
 
   return (
-    <section
-      id="contact"
-      aria-labelledby="contact-heading"
-      className="border-t border-rule py-20 md:py-32"
-    >
-      <div className="shell">
-        <Reveal>
-          <span className="label">06</span>
-          <h2 id="contact-heading" className="mt-4 font-sans text-sm text-ink-muted">
-            Contact
-          </h2>
-        </Reveal>
+    <Section id="contact" index="06" title="Contact">
+      <Reveal>
+        <p className="max-w-xl font-serif text-2xl leading-snug md:text-[2rem] md:leading-[1.25]">
+          {profile.availability}. Email is the quickest way to reach me.
+        </p>
+      </Reveal>
 
-        <Reveal delay={0.05}>
-          <p className="mt-8 max-w-xl font-serif text-2xl leading-snug text-balance md:text-3xl">
-            {profile.availability}. Email is the quickest way to reach me.
-          </p>
-        </Reveal>
+      <Reveal delay={0.06}>
+        <a
+          href={`mailto:${profile.email}`}
+          className="link-underline mt-9 inline-block font-serif text-[clamp(1.4rem,4.6vw,2.75rem)] leading-none tracking-tight transition-colors hover:text-accent"
+        >
+          {profile.email}
+        </a>
+      </Reveal>
 
-        <Reveal delay={0.1}>
-          <a
-            href={`mailto:${profile.email}`}
-            className="link-underline mt-10 inline-block font-serif text-[clamp(1.5rem,5.5vw,3.25rem)] leading-none tracking-tight transition-colors hover:text-accent"
-          >
-            {profile.email}
-          </a>
-        </Reveal>
-
-        <Reveal delay={0.15}>
-          <dl className="mt-14 grid gap-8 border-t border-rule pt-8 sm:grid-cols-3">
-            {channels.map((channel) => (
-              <div key={channel.label}>
-                <dt className="label">{channel.label}</dt>
-                <dd className="mt-1.5">
-                  <a
-                    href={channel.href}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="link-underline text-sm text-ink transition-colors hover:text-accent"
-                  >
-                    {channel.value}
-                  </a>
-                </dd>
-              </div>
-            ))}
-            <div>
-              <dt className="label">Location</dt>
-              <dd className="mt-1.5 text-sm text-ink-muted">{profile.location}</dd>
+      <Reveal delay={0.12}>
+        <dl className="mt-14 grid gap-8 border-t border-rule pt-8 sm:grid-cols-3">
+          {channels.map((channel) => (
+            <div key={channel.label}>
+              <dt className="label">{channel.label}</dt>
+              <dd className="mt-2">
+                <a
+                  href={channel.href}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="link-underline text-[0.9375rem] text-ink transition-colors hover:text-accent"
+                >
+                  {channel.value}
+                </a>
+              </dd>
             </div>
-          </dl>
-        </Reveal>
-      </div>
-    </section>
+          ))}
+          <div>
+            <dt className="label">Location</dt>
+            <dd className="mt-2 text-[0.9375rem] text-ink-muted">{profile.location}</dd>
+          </div>
+        </dl>
+      </Reveal>
+    </Section>
   );
 }

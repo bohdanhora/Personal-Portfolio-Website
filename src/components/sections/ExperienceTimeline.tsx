@@ -31,13 +31,13 @@ export function ExperienceTimeline() {
           <Reveal as="header" className="relative">
             <span
               aria-hidden
-              className="absolute -left-7 top-[0.6rem] h-[7px] w-[7px] -translate-x-1/2 rounded-full bg-accent md:-left-10"
+              className="absolute -left-7 top-[0.7rem] h-2 w-2 -translate-x-1/2 rounded-full bg-accent md:-left-10"
             />
             <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-              <h3 className="font-serif text-2xl tracking-tight">{company.name}</h3>
+              <h3 className="font-serif text-[1.75rem] tracking-tight md:text-3xl">{company.name}</h3>
               <span className="label">{company.arrangement}</span>
             </div>
-            <p className="mt-1 text-sm text-ink-faint">
+            <p className="mt-1.5 text-sm text-ink-faint">
               {company.period}
               <span aria-hidden className="px-2 text-rule-strong">
                 /
@@ -54,8 +54,8 @@ export function ExperienceTimeline() {
                     <p className="label md:col-span-3 md:pt-1 md:tracking-[0.08em]">{role.period}</p>
 
                     <div className="md:col-span-9">
-                      <h4 className="text-[0.95rem] font-medium text-ink">{role.title}</h4>
-                      <p className="mt-2.5 text-sm leading-relaxed text-ink-muted">{role.summary}</p>
+                      <h4 className="text-base font-medium text-ink">{role.title}</h4>
+                      <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-muted">{role.summary}</p>
 
                       {role.focus ? (
                         <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-1.5">

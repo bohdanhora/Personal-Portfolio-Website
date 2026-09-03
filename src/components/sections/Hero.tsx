@@ -32,7 +32,10 @@ export function Hero() {
   return (
     <section id="top" ref={ref} className="relative flex min-h-[92svh] items-center pt-28 pb-20">
       <motion.div className="shell w-full" style={reduced ? undefined : { y, opacity }}>
-        <p className="label animate-fade-up">{profile.title}</p>
+        <div className="animate-fade-up flex items-center gap-4">
+          <span aria-hidden className="h-px w-10 bg-accent" />
+          <p className="label">{profile.title}</p>
+        </div>
 
         <h1 className="mt-6 font-serif text-[clamp(3.25rem,11vw,8.5rem)] leading-[0.9] tracking-[-0.035em]">
           {nameWords.map((word, index) => (
@@ -54,18 +57,20 @@ export function Hero() {
           className="animate-fade-up mt-12 grid gap-10 md:mt-16 md:grid-cols-12"
           style={{ animationDelay: "0.45s" }}
         >
-          <p className="max-w-xl text-lg leading-relaxed text-balance md:col-span-7 md:text-xl">
+          <p className="max-w-2xl text-xl leading-relaxed md:col-span-7 md:text-[1.5rem] md:leading-[1.45]">
             {profile.intro[0]} <span className="text-ink-muted">{profile.intro[1]}</span>
           </p>
 
-          <dl className="grid grid-cols-2 gap-6 self-end md:col-span-4 md:col-start-9 md:grid-cols-1 md:gap-5">
-            <div>
+          <dl className="divide-y divide-rule self-end border-t border-rule md:col-span-4 md:col-start-9">
+            <div className="py-4">
               <dt className="label">Based in</dt>
-              <dd className="mt-1.5 text-sm text-ink-muted">{profile.location}</dd>
+              <dd className="mt-2 text-[0.9375rem] text-ink">{profile.location}</dd>
             </div>
-            <div>
+            <div className="py-4">
               <dt className="label">Status</dt>
-              <dd className="mt-1.5 text-sm text-ink-muted">{profile.availability}</dd>
+              <dd className="mt-2 text-[0.9375rem] leading-snug text-ink">
+                {profile.availability}
+              </dd>
             </div>
           </dl>
         </div>

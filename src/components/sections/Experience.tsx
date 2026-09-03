@@ -10,8 +10,8 @@ export function Experience() {
 
       <Reveal className="mt-16 border-t border-rule pt-8">
         <h3 className="label">Education</h3>
-        <p className="mt-3 font-serif text-xl tracking-tight">{education.institution}</p>
-        <p className="mt-1.5 text-sm text-ink-muted">
+        <p className="mt-3 font-serif text-2xl tracking-tight">{education.institution}</p>
+        <p className="mt-2 text-[0.9375rem] text-ink-muted">
           {education.qualification}
           <span aria-hidden className="px-2 text-rule-strong">
             /
