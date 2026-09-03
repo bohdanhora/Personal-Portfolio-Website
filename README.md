@@ -32,7 +32,7 @@ under `src/data`, which keeps copy separate from presentation and makes updates 
 | Selected work | Five products described at the level of the engineering problem |
 | Skills | Technologies grouped by area, only ones I have used in practice |
 | Approach | How I work on a team and in existing codebases |
-| Contact | Email, LinkedIn and GitHub |
+| Contact | Email, LinkedIn and GitHub, plus the CV download |
 
 ## Tech stack
 
@@ -43,9 +43,10 @@ under `src/data`, which keeps copy separate from presentation and makes updates 
 | Animation | Motion, with full `prefers-reduced-motion` support |
 | Typography | Newsreader, Inter and JetBrains Mono through `next/font` |
 | Metadata | Next.js Metadata API, generated Open Graph image, sitemap, robots, JSON-LD |
+| CV | pdfmake, at build time only |
 | Tooling | ESLint, Prettier, TypeScript in strict mode |
 
-Nothing else is installed. The whole page is prerendered as static content.
+Nothing ships to the browser beyond that. The whole page is prerendered as static content.
 
 ## Getting started
 
@@ -63,7 +64,8 @@ Open [http://localhost:3000](http://localhost:3000).
 | Command | Description |
 | --- | --- |
 | `npm run dev` | Start the development server |
-| `npm run build` | Create the production build |
+| `npm run cv` | Rebuild the CV PDF from `src/data` |
+| `npm run build` | Create the production build, regenerating the CV first |
 | `npm run start` | Serve the production build |
 | `npm run lint` | Run ESLint |
 | `npm run typecheck` | Run the TypeScript compiler without emitting |
@@ -72,6 +74,7 @@ Open [http://localhost:3000](http://localhost:3000).
 ## Project structure
 
 ```text
+scripts/          CV generator, run through `npm run cv`
 src/
   app/            Root layout, page, metadata, sitemap, robots, Open Graph image
   components/
@@ -85,6 +88,16 @@ src/
 ```
 
 Editing content means editing `src/data`. Components read from it and never hold copy of their own.
+
+## CV
+
+The downloadable CV is not a separate document. `npm run cv` reads the same files under
+`src/data` and typesets them into `public/bohdan-hora-cv.pdf` with pdfmake, using the site's
+own faces and accent colour so the two match. It runs automatically before every production
+build, so editing the content is enough to update both the page and the PDF.
+
+If the fonts cannot be downloaded during a build, the script leaves the committed PDF in place
+rather than failing.
 
 ## Deployment
 
