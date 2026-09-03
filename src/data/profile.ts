@@ -4,7 +4,7 @@ export const profile: Profile = {
   name: "Bohdan Hora",
   title: "Full-Stack Software Engineer",
   location: "Ukraine",
-  availability: "Open to full-stack and backend roles",
+  availability: "Open to full-stack, frontend and backend roles",
   intro: [
     "I build web products in TypeScript on both sides of the API.",
     "React and Next.js on the front, NestJS and Fastify on the back, with PostgreSQL, MongoDB and Redis underneath.",

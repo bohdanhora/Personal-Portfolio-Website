@@ -2,27 +2,27 @@ import type { ApproachItem } from "@/types";
 
 export const approach: ApproachItem[] = [
   {
-    title: "Read the system before changing it",
-    body: "Almost every task starts inside code someone else wrote. I would rather spend an hour understanding why it looks the way it does than an afternoon undoing a decision I did not see.",
+    title: "I read the code before I change it",
+    body: "Most tasks land in a codebase someone else has been living in for two years. There is usually a reason things look strange, and it is cheaper to go find that reason than to run into it later.",
   },
   {
-    title: "Small changes that can actually be reviewed",
-    body: "Five commits that each do one thing beat one branch that touches everything. Review stays honest, and reverting a mistake costs minutes instead of a day.",
+    title: "Small commits",
+    body: "I split work into changes that fit in one review. It is not about tidiness. It is that when something breaks two weeks later, you want to revert one commit rather than a branch that touched half the app.",
   },
   {
-    title: "Reproduce, then fix",
-    body: "When something breaks in production I go for logs, a reproduction and a narrowed-down case. Guessing at a fix and shipping it usually costs more time than it saves.",
+    title: "Reproduce first",
+    body: "In production I go for logs and a reproduction before I go for a fix. Shipping a guess and watching whether it helps is the slowest way to debug anything, and I have used it enough times to be sure of that.",
   },
   {
-    title: "Boring where it counts",
-    body: "Auth, caching, migrations and anything touching money get the plain, unclever version. Complexity is worth paying for in the few places the product genuinely needs it.",
+    title: "Boring code in the dangerous places",
+    body: "Auth, migrations, caching, anything that touches money. Those get the dull, obvious version even when a clever one exists. The complexity budget is better spent on the part of the product that actually needs it.",
   },
   {
-    title: "Types instead of arguments",
-    body: "When a contract is typed from the database through to the component, the conversation with the team is about behavior rather than about what shape the response is in.",
+    title: "Types across the boundary",
+    body: "If a response is typed from the database through to the component, nobody has to ask what an endpoint returns. That removes a category of conversation I do not enjoy having.",
   },
   {
-    title: "Product before ticket",
-    body: "A ticket describes a symptom often enough. Asking what the user was trying to do usually changes the solution, and sometimes removes the need for one.",
+    title: "Ask what the user was doing",
+    body: "Tickets describe symptoms. Often enough the fix that was requested is not the fix that is needed, and the only way to find that out is to ask what the person was trying to do when they hit it.",
   },
 ];
