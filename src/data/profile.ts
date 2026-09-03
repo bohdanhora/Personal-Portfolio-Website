@@ -35,6 +35,9 @@ export const profile: Profile = {
   },
 };
 
+/** Written by `npm run cv` into `public`, and linked from the site. */
+export const cvFileName = "bohdan-hora-cv.pdf";
+
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL ??
   (process.env.VERCEL_PROJECT_PRODUCTION_URL
