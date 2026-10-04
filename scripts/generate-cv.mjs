@@ -1,8 +1,3 @@
-/**
- * Builds the downloadable CV from the same content the site renders, so the
- * two can never drift apart. Run through `npm run cv`, and automatically
- * before every production build.
- */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
@@ -11,212 +6,375 @@ import { loadFonts } from "./fonts.mjs";
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), "..");
 
-// The content files are plain TypeScript with type-only imports, which Node
-// can run directly. Reading them here is what keeps the CV in step with the site.
 const load = (file) => import(pathToFileURL(path.join(root, "src/data", file)).href);
 
-const { profile, cvFileName } = await load("profile.ts");
-const { companies, education } = await load("experience.ts");
+const { profile, cvFileName, siteUrl } = await load("profile.ts");
+const { companies, education, courses } = await load("experience.ts");
 const { projects } = await load("projects.ts");
 const { skillGroups } = await load("skills.ts");
+const { dictionaries } = await load("dictionary.ts");
 
-const INK = "#1a1815";
-const MUTED = "#4d483f";
-const FAINT = "#6b655a";
-const ACCENT = "#a2593a";
-const RULE = "#ded8cd";
+const INK = "#0c0d0e";
+const MUTED = "#3d4045";
+const FAINT = "#64686e";
+const ACCENT = "#2531e0";
+const RULE = "#cdd0d1";
 
-const PAGE_MARGIN = 46;
+const PAGE_MARGIN = 42;
 const CONTENT_WIDTH = 595.28 - PAGE_MARGIN * 2;
+const KEY_WIDTH = 92;
 
-const rule = (width = CONTENT_WIDTH, color = RULE, top = 0) => ({
-  canvas: [{ type: "line", x1: 0, y1: 0, x2: width, y2: 0, lineWidth: 0.6, lineColor: color }],
-  margin: [0, top, 0, 0],
-});
+const hasPublicUrl = !siteUrl.includes("localhost");
 
-const heading = (text) => ({
-  stack: [
-    { text, font: "Display", fontSize: 12.5, color: INK },
-    rule(20, ACCENT, 4),
-  ],
-  margin: [0, 15, 0, 8],
-});
+function build(locale) {
+  const tr = (value) => (typeof value === "string" ? value : value[locale]);
+  const dict = dictionaries[locale];
 
-const titledRow = (left, right, options = {}) => ({
-  columns: [
-    { width: "*", text: left, font: "Text", fontSize: options.size ?? 10, bold: true, color: INK },
-    { width: "auto", text: right, font: "Text", fontSize: 8.5, color: FAINT, alignment: "right" },
-  ],
-  margin: options.margin ?? [0, 0, 0, 0],
-});
+  const line = (width = CONTENT_WIDTH, color = RULE, weight = 0.6, top = 0) => ({
+    canvas: [{ type: "line", x1: 0, y1: 0, x2: width, y2: 0, lineWidth: weight, lineColor: color }],
+    margin: [0, top, 0, 0],
+  });
 
-const meta = (text, margin = [0, 2, 0, 0]) => ({
-  text,
-  font: "Text",
-  fontSize: 8.5,
-  color: FAINT,
-  margin,
-});
+  const mono = (text, options = {}) => ({
+    text,
+    font: "Mono",
+    fontSize: options.size ?? 6.8,
+    color: options.color ?? FAINT,
+    characterSpacing: options.spacing ?? 0.2,
+    margin: options.margin ?? [0, 0, 0, 0],
+    ...(options.link ? { link: options.link } : {}),
+    ...(options.alignment ? { alignment: options.alignment } : {}),
+  });
 
-const body = (text, margin = [0, 4, 0, 0]) => ({
-  text,
-  font: "Text",
-  fontSize: 8.7,
-  color: MUTED,
-  lineHeight: 1.28,
-  margin,
-});
+  const body = (text, margin = [0, 3, 0, 0], color = MUTED) => ({
+    text,
+    font: "Text",
+    fontSize: 8.6,
+    color,
+    lineHeight: 1.24,
+    margin,
+  });
 
-function header() {
-  return [
-    {
-      columns: [
+  let sectionIndex = 0;
+
+  const heading = (text) => {
+    sectionIndex += 1;
+    return {
+      stack: [
+        line(CONTENT_WIDTH, INK, 1.1),
         {
-          width: "*",
-          stack: [
-            { text: profile.name, font: "Display", fontSize: 26, color: INK },
+          columns: [
             {
-              text: profile.title.toUpperCase(),
-              font: "Text",
-              fontSize: 8,
-              characterSpacing: 1.6,
-              color: FAINT,
-              margin: [0, 7, 0, 0],
+              width: KEY_WIDTH + 10,
+              ...mono(`§${String(sectionIndex).padStart(2, "0")}`, { color: ACCENT, size: 7, margin: [0, 1.5, 0, 0] }),
+            },
+            {
+              width: "*",
+              text: text.toUpperCase(),
+              font: "Display",
+              bold: true,
+              fontSize: 9,
+              color: INK,
+              characterSpacing: 0.4,
             },
           ],
-        },
-        {
-          width: "auto",
-          alignment: "right",
-          font: "Text",
-          fontSize: 8.5,
-          color: MUTED,
-          lineHeight: 1.5,
-          stack: [
-            { text: profile.email, link: `mailto:${profile.email}` },
-            { text: profile.links.linkedin.handle, link: profile.links.linkedin.href },
-            { text: profile.links.github.handle, link: profile.links.github.href },
-            { text: profile.location, color: FAINT },
-          ],
+          columnGap: 0,
+          margin: [0, 5, 0, 0],
         },
       ],
-    },
-    rule(CONTENT_WIDTH, RULE, 16),
+      margin: [0, 16, 0, 9],
+    };
+  };
+
+  const section = (title, [first, ...rest]) => [
+    { unbreakable: true, stack: [heading(title), first] },
+    ...rest,
   ];
-}
 
-function profileSection() {
-  const [lede, , , closing] = profile.about;
+  const keyed = (key, content, margin = [0, 0, 0, 0]) => ({
+    columns: [
+      { width: KEY_WIDTH, ...mono(key.toUpperCase(), { margin: [0, 1.6, 0, 0] }) },
+      { width: "*", stack: Array.isArray(content) ? content : [content] },
+    ],
+    columnGap: 10,
+    margin,
+  });
 
-  return [
-    heading("Profile"),
-    body(lede, [0, 0, 0, 0]),
-    body(closing, [0, 7, 0, 0]),
-    {
-      columns: profile.facts.map((fact) => ({
-        width: "*",
+  const bullets = (items) => ({
+    margin: [0, 4, 0, 0],
+    stack: items.map((item) => ({
+      columns: [
+        { width: 10, text: "→", font: "Mono", fontSize: 6.8, color: ACCENT, margin: [0, 1.2, 0, 0] },
+        { width: "*", text: tr(item), font: "Text", fontSize: 8.6, color: INK, lineHeight: 1.25 },
+      ],
+      margin: [0, 1.2, 0, 0],
+    })),
+  });
+
+  const stack = (items, margin = [0, 4, 0, 0]) => ({
+    ...mono(items.join(" / "), { color: MUTED, margin, spacing: 0 }),
+    lineHeight: 1.35,
+  });
+
+  const yearMonth = (value) => (value === "present" ? dict.now : value.replace("-", "."));
+
+  function header() {
+    const name = tr(profile.name).toUpperCase();
+    const contacts = [
+      [dict.location, tr(profile.location)],
+      [dict.email, profile.email, `mailto:${profile.email}`],
+      ...(profile.phone
+        ? [
+            [
+              dict.phone,
+              `${profile.phone.display}${profile.phone.messengers.length ? ` (${profile.phone.messengers.join(", ")})` : ""}`,
+              profile.phone.href,
+            ],
+          ]
+        : []),
+      ["LinkedIn", profile.links.linkedin.href.replace("https://www.", ""), profile.links.linkedin.href],
+      ["GitHub", profile.links.github.href.replace("https://", ""), profile.links.github.href],
+      ["Telegram", profile.links.telegram.handle, profile.links.telegram.href],
+      ...(hasPublicUrl ? [[dict.cv.portfolio, siteUrl.replace("https://", ""), siteUrl]] : []),
+    ];
+
+    return [
+      {
+        columns: [
+          {
+            width: "*",
+            stack: [
+              {
+                columns: [
+                  {
+                    width: "auto",
+                    text: name,
+                    font: "Display",
+                    bold: true,
+                    fontSize: 24,
+                    color: INK,
+                    characterSpacing: -0.4,
+                  },
+                  { width: 12, canvas: [{ type: "rect", x: 0, y: 6, w: 12, h: 17, color: ACCENT }] },
+                ],
+                columnGap: 5,
+              },
+              mono(dict.cv.desiredPosition.toUpperCase(), { margin: [0, 12, 0, 0] }),
+              {
+                text: tr(profile.position),
+                font: "Text",
+                bold: true,
+                fontSize: 11,
+                color: INK,
+                margin: [0, 2, 0, 0],
+              },
+              {
+                text: tr(profile.availability),
+                font: "Text",
+                fontSize: 8.6,
+                color: MUTED,
+                margin: [0, 2, 0, 0],
+              },
+            ],
+          },
+          {
+            width: 190,
+            stack: contacts.map(([key, value, link]) => ({
+              columns: [
+                { width: 52, ...mono(key.toUpperCase(), { margin: [0, 1.4, 0, 0] }) },
+                {
+                  width: "*",
+                  text: value,
+                  font: "Text",
+                  fontSize: 8.2,
+                  color: link ? INK : MUTED,
+                  ...(link ? { link } : {}),
+                },
+              ],
+              columnGap: 6,
+              margin: [0, 0, 0, 3],
+            })),
+          },
+        ],
+        columnGap: 20,
+      },
+    ];
+  }
+
+  function summary() {
+    const paragraphs = profile.about.map(tr);
+    const [lede] = paragraphs;
+    const [product, closing] = paragraphs.slice(-2);
+    return section(dict.cv.summary, [
+      body(`${profile.intro.map(tr).join(" ")} ${lede}`, [0, 0, 0, 0], INK),
+      body(product, [0, 5, 0, 0]),
+      body(closing, [0, 5, 0, 0]),
+    ]);
+  }
+
+  function skills() {
+    const rows = [
+      ...skillGroups.map((group) => [tr(group.title), group.items.map(tr).join("  ·  ")]),
+      [
+        dict.cv.languages,
+        profile.languages.map((language) => `${tr(language.name)}: ${tr(language.level)}`).join("  ·  "),
+      ],
+    ];
+
+    return section(
+      dict.cv.skills,
+      rows.map(([title, items], index) =>
+        keyed(title, body(items, [0, 0, 0, 0], INK), [0, index === 0 ? 0 : 4.5, 0, 0]),
+      ),
+    );
+  }
+
+  function experience() {
+    const content = [];
+
+    companies.forEach((company, companyIndex) => {
+      content.push({
+        margin: [0, companyIndex === 0 ? 0 : 12, 0, 0],
         stack: [
           {
-            text: fact.label.toUpperCase(),
-            font: "Text",
-            fontSize: 7,
-            characterSpacing: 1.1,
-            color: FAINT,
+            columns: [
+              {
+                width: "*",
+                text: tr(company.name),
+                font: "Display",
+                bold: true,
+                fontSize: 10.5,
+                color: INK,
+              },
+              {
+                width: "auto",
+                ...mono(
+                  `${tr(company.period)}  ·  ${tr(company.location)}  ·  ${tr(company.arrangement)}`.toUpperCase(),
+                  { margin: [0, 2.5, 0, 0] },
+                ),
+              },
+            ],
           },
-          { text: fact.value, font: "Text", fontSize: 8.5, color: INK, margin: [0, 3, 0, 0] },
-        ],
-      })),
-      columnGap: 18,
-      margin: [0, 11, 0, 0],
-    },
-  ];
-}
-
-function experienceSection() {
-  const content = [heading("Experience")];
-
-  companies.forEach((company, index) => {
-    content.push(
-      titledRow(company.name, company.period, {
-        size: 10.5,
-        margin: [0, index === 0 ? 0 : 13, 0, 0],
-      }),
-      meta(`${company.location} / ${company.arrangement}`),
-    );
-
-    company.roles.forEach((role) => {
-      content.push({
-        margin: [12, 7, 0, 0],
-        stack: [
-          titledRow(role.title, role.period, { size: 9.5 }),
-          body(role.summary, [0, 3, 0, 0]),
-          meta(role.tech.join("   /   "), [0, 4, 0, 0]),
+          line(CONTENT_WIDTH, INK, 0.6, 4),
         ],
       });
+
+      company.roles.forEach((role, roleIndex) => {
+        content.push({
+          margin: [0, 7, 0, 0],
+          unbreakable: role.duties.length < 5,
+          stack: [
+            ...(roleIndex > 0 ? [line(CONTENT_WIDTH - KEY_WIDTH - 10, RULE, 0.5)] : []).map((rule) => ({
+              ...rule,
+              margin: [KEY_WIDTH + 10, 0, 0, 7],
+            })),
+            keyed(`${yearMonth(role.start)} → ${yearMonth(role.end)}`, [
+              { text: role.title, font: "Text", bold: true, fontSize: 9.6, color: INK },
+              body(tr(role.summary), [0, 2, 0, 0]),
+              bullets(role.duties),
+              stack(role.tech),
+            ]),
+          ],
+        });
+      });
     });
-  });
 
-  return content;
-}
+    const [companyHeader, firstRole, ...rest] = content;
+    return section(dict.cv.experience, [{ stack: [companyHeader, firstRole] }, ...rest]);
+  }
 
-function projectsSection() {
-  // Commercial work is already covered by the roles above, so only the
-  // projects that can be looked at in public get their own entry.
-  const publicProjects = projects.filter((project) => project.links?.length);
-  if (publicProjects.length === 0) return [];
+  function personalProjects() {
+    const items = projects.filter((project) => project.personal);
+    if (items.length === 0) return [];
 
-  const content = [heading("Projects")];
-
-  publicProjects.forEach((project, index) => {
-    content.push({
-      margin: [0, index === 0 ? 0 : 10, 0, 0],
-      stack: [
-        titledRow(project.title, project.period, { size: 10 }),
-        body(project.summary, [0, 4, 0, 0]),
-        meta(project.tech.join("   /   "), [0, 4, 0, 0]),
-        {
-          margin: [0, 4, 0, 0],
-          text: project.links.map((link, linkIndex) => [
-            linkIndex > 0 ? { text: "   /   ", color: FAINT } : "",
-            { text: link.href.replace("https://", ""), link: link.href, color: ACCENT },
+    return section(
+      dict.cv.projects,
+      items.map((project, index) => ({
+        margin: [0, index === 0 ? 0 : 9, 0, 0],
+        unbreakable: true,
+        stack: [
+          keyed(tr(project.period), [
+            { text: tr(project.title), font: "Text", bold: true, fontSize: 9.6, color: INK },
+            body(tr(project.summary), [0, 2, 0, 0]),
+            stack(project.tech),
+            {
+              margin: [0, 3, 0, 0],
+              text: (project.links ?? []).flatMap((link, linkIndex) => [
+                linkIndex > 0 ? { text: "   ", color: FAINT } : "",
+                { text: `${tr(link.label)}: `, color: FAINT },
+                { text: link.href.replace("https://", ""), link: link.href, color: ACCENT },
+              ]),
+              font: "Text",
+              fontSize: 7.8,
+            },
           ]),
-          font: "Text",
-          fontSize: 8.5,
-        },
-      ],
-    });
-  });
+        ],
+      })),
+    );
+  }
 
-  return content;
-}
+  function educationAndCourses() {
+    return section(`${dict.cv.education} / ${dict.cv.courses}`, [
+      {
+        unbreakable: true,
+        stack: [
+          keyed(tr(education.period), [
+            { text: tr(education.institution), font: "Text", bold: true, fontSize: 9.6, color: INK },
+            body(`${tr(education.field)}. ${tr(education.qualification)}. ${tr(education.note)}`, [0, 2, 0, 0]),
+          ]),
+          ...courses.map((course) =>
+            keyed(
+              tr(course.period),
+              [
+                {
+                  text: `${tr(course.title)}, ${course.provider}`,
+                  font: "Text",
+                  bold: true,
+                  fontSize: 9.6,
+                  color: INK,
+                },
+                body(tr(course.note), [0, 2, 0, 0]),
+              ],
+              [0, 8, 0, 0],
+            ),
+          ),
+        ],
+      },
+    ]);
+  }
 
-function skillsSection() {
-  return [
-    heading("Skills"),
-    ...skillGroups.map((group, index) => ({
+  return {
+    pageSize: "A4",
+    pageMargins: [PAGE_MARGIN, PAGE_MARGIN, PAGE_MARGIN, 40],
+    info: {
+      title: `${tr(profile.name)}, ${profile.title}`,
+      author: tr(profile.name),
+      subject: dict.cv.subject,
+    },
+    defaultStyle: { font: "Text", fontSize: 8.6, color: INK },
+    footer: (currentPage, pageCount) => ({
       columns: [
-        { width: 104, text: group.title, font: "Text", fontSize: 9, bold: true, color: INK },
+        { width: "*", text: `${tr(profile.name).toUpperCase()}  ·  ${profile.title.toUpperCase()}` },
         {
-          width: "*",
-          text: group.items.join("   ·   "),
-          font: "Text",
-          fontSize: 8.7,
-          color: MUTED,
-          lineHeight: 1.3,
+          width: "auto",
+          text: `${currentPage} ${dict.cv.of} ${pageCount}`,
+          alignment: "right",
         },
       ],
-      margin: [0, index === 0 ? 0 : 6, 0, 0],
-    })),
-  ];
-}
-
-function educationSection() {
-  return [
-    heading("Education"),
-    titledRow(education.institution, education.period, { size: 10 }),
-    body(`${education.qualification} / ${education.field}`, [0, 3, 0, 0]),
-    meta(education.note),
-  ];
+      font: "Mono",
+      fontSize: 6.4,
+      color: FAINT,
+      margin: [PAGE_MARGIN, 16, PAGE_MARGIN, 0],
+    }),
+    content: [
+      ...header(),
+      ...summary(),
+      ...skills(),
+      ...experience(),
+      ...personalProjects(),
+      ...educationAndCourses(),
+    ],
+  };
 }
 
 const fonts = await loadFonts();
@@ -225,17 +383,15 @@ if (!fonts) {
   process.exit(0);
 }
 
-// pdfmake wants file names rather than buffers, so the downloaded faces are
-// registered in its in-memory file system first.
 const descriptors = {};
 
-for (const [family, weights] of Object.entries(fonts)) {
+for (const [family, styles] of Object.entries(fonts)) {
   descriptors[family] = {};
 
-  for (const [weight, buffer] of Object.entries(weights)) {
-    const name = `${family}-${weight}.ttf`;
+  for (const [style, buffer] of Object.entries(styles)) {
+    const name = `${family}-${style}.ttf`;
     pdfmake.virtualfs.writeFileSync(name, buffer);
-    descriptors[family][weight] = name;
+    descriptors[family][style] = name;
   }
 }
 
@@ -244,36 +400,10 @@ pdfmake.setUrlAccessPolicy(() => false);
 pdfmake.setLocalAccessPolicy(() => false);
 
 const outputDirectory = path.join(root, "public");
-const outputPath = path.join(outputDirectory, cvFileName);
 fs.mkdirSync(outputDirectory, { recursive: true });
 
-const document = pdfmake.createPdf({
-  pageSize: "A4",
-  pageMargins: [PAGE_MARGIN, PAGE_MARGIN, PAGE_MARGIN, 36],
-  info: {
-    title: `${profile.name}, ${profile.title}`,
-    author: profile.name,
-    subject: "Curriculum vitae",
-  },
-  defaultStyle: { font: "Text", fontSize: 9, color: INK },
-  footer: (currentPage, pageCount) => ({
-    columns: [
-      { width: "*", text: `${profile.name} / ${profile.title}` },
-      { width: "auto", text: `${currentPage} of ${pageCount}`, alignment: "right" },
-    ],
-    fontSize: 7.5,
-    color: FAINT,
-    margin: [PAGE_MARGIN, 12, PAGE_MARGIN, 0],
-  }),
-  content: [
-    ...header(),
-    ...profileSection(),
-    ...experienceSection(),
-    ...projectsSection(),
-    ...skillsSection(),
-    ...educationSection(),
-  ],
-});
-
-await document.write(outputPath);
-console.log(`Wrote ${path.relative(root, outputPath)}`);
+for (const [locale, fileName] of Object.entries(cvFileName)) {
+  const outputPath = path.join(outputDirectory, fileName);
+  await pdfmake.createPdf(build(locale)).write(outputPath);
+  console.log(`Wrote ${path.relative(root, outputPath)}`);
+}

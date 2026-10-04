@@ -1,14 +1,8 @@
-/**
- * Downloads the display and text faces used on the site so the PDF is set in
- * the same typography. Falls back to the standard PDF faces when the network
- * is not available, which keeps a build from failing over a cosmetic detail.
- */
 const GOOGLE_FONTS = "https://fonts.googleapis.com/css2";
 
 async function fetchFamily(family, weights) {
   const query = `${family}:wght@${weights.join(";")}`;
   const css = await fetch(`${GOOGLE_FONTS}?family=${encodeURIComponent(query)}`, {
-    // A plain agent makes Google serve TrueType rather than woff2.
     headers: { "User-Agent": "Mozilla/5.0" },
   }).then((response) => response.text());
 
@@ -29,24 +23,23 @@ async function fetchFamily(family, weights) {
   });
 }
 
+const family = (normal, bold = normal) => ({
+  normal,
+  bold,
+  italics: normal,
+  bolditalics: bold,
+});
+
 export async function loadFonts() {
   try {
-    const [serifRegular, serifBold] = await fetchFamily("Newsreader", [400, 600]);
-    const [sansRegular, sansBold] = await fetchFamily("Inter", [400, 600]);
+    const [displayRegular, displayBold] = await fetchFamily("Unbounded", [400, 600]);
+    const [textRegular, textBold] = await fetchFamily("IBM Plex Sans", [400, 600]);
+    const [mono] = await fetchFamily("Martian Mono", [400]);
 
     return {
-      Display: {
-        normal: serifRegular,
-        bold: serifBold,
-        italics: serifRegular,
-        bolditalics: serifBold,
-      },
-      Text: {
-        normal: sansRegular,
-        bold: sansBold,
-        italics: sansRegular,
-        bolditalics: sansBold,
-      },
+      Display: family(displayRegular, displayBold),
+      Text: family(textRegular, textBold),
+      Mono: family(mono),
     };
   } catch (error) {
     console.warn(`Could not download the fonts, keeping the existing CV: ${error.message}`);
