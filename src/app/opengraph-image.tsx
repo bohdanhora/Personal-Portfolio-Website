@@ -1,25 +1,22 @@
 import { ImageResponse } from "next/og";
 import { profile } from "@/data/profile";
+import { t } from "@/lib/i18n";
 
-export const alt = `${profile.name}, ${profile.title}`;
+const name = t(profile.name, "en");
+const lede = t(profile.intro[0] ?? "", "en");
+const stack = "TYPESCRIPT / REACT / NEXT.JS / NESTJS / POSTGRESQL";
+const handle = profile.links.github.href.replace("https://", "");
+
+export const alt = `${name}, ${profile.title}`;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const eyebrow = profile.title.toUpperCase();
-const lede = profile.intro[0] ?? "";
-const handle = profile.links.github.href.replace("https://", "");
-
-/**
- * Pulls the display face used on the site so the share card matches it.
- * Only the glyphs on the card are requested. If the network is unavailable at
- * build time the card still renders with the default face.
- */
-async function loadDisplayFont(): Promise<ArrayBuffer | null> {
-  const glyphs = Array.from(new Set([eyebrow, profile.name, lede, profile.location, handle].join(""))).join("");
+async function loadFont(family: string, weight: number, text: string): Promise<ArrayBuffer | null> {
+  const glyphs = Array.from(new Set(text)).join("");
 
   try {
     const css = await fetch(
-      `https://fonts.googleapis.com/css2?family=Newsreader:wght@400&text=${encodeURIComponent(glyphs)}`,
+      `https://fonts.googleapis.com/css2?family=${encodeURIComponent(family)}:wght@${weight}&text=${encodeURIComponent(glyphs)}`,
       { headers: { "User-Agent": "Mozilla/5.0" } },
     ).then((response) => response.text());
 
@@ -33,54 +30,92 @@ async function loadDisplayFont(): Promise<ArrayBuffer | null> {
 }
 
 export default async function OpenGraphImage() {
-  const displayFont = await loadDisplayFont();
+  const [display, mono] = await Promise.all([
+    loadFont("Unbounded", 600, name.toUpperCase()),
+    loadFont("Martian Mono", 400, [profile.title.toUpperCase(), stack, handle, lede].join("")),
+  ]);
+
+  const fonts = [
+    display && { name: "Unbounded", data: display, style: "normal" as const, weight: 600 as const },
+    mono && { name: "Martian Mono", data: mono, style: "normal" as const, weight: 400 as const },
+  ].filter((font) => font !== null);
 
   return new ImageResponse(
-    (
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        backgroundColor: "#f0f1ee",
+        color: "#0c0d0e",
+        padding: "56px 64px",
+        fontFamily: "Martian Mono",
+      }}
+    >
       <div
         style={{
-          width: "100%",
-          height: "100%",
           display: "flex",
-          flexDirection: "column",
           justifyContent: "space-between",
-          backgroundColor: "#f5f3ef",
-          color: "#1a1815",
-          padding: "72px 80px",
+          fontSize: 20,
+          borderTop: "2px solid #0c0d0e",
+          borderBottom: "2px solid #0c0d0e",
+          padding: "14px 0",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-          <div style={{ width: 56, height: 1, backgroundColor: "#a2593a" }} />
-          <div style={{ fontSize: 21, letterSpacing: 4, color: "#736c5e" }}>{eyebrow}</div>
-        </div>
-
-        <div style={{ display: "flex", flexDirection: "column" }}>
-          <div style={{ fontSize: 140, letterSpacing: -4, lineHeight: 1 }}>{profile.name}</div>
-          <div style={{ marginTop: 32, fontSize: 32, lineHeight: 1.4, color: "#5f594f" }}>
-            {lede}
-          </div>
-        </div>
-
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            fontSize: 23,
-            color: "#736c5e",
-            borderTop: "1px solid #ded8ce",
-            paddingTop: 26,
-          }}
-        >
-          <div>{profile.location}</div>
-          <div>{handle}</div>
+        <div>{profile.title.toUpperCase()}</div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, color: "#2531e0" }}>
+          <div style={{ width: 14, height: 14, backgroundColor: "#2531e0" }} />
+          OPEN TO WORK
         </div>
       </div>
-    ),
-    {
-      ...size,
-      fonts: displayFont
-        ? [{ name: "Newsreader", data: displayFont, style: "normal", weight: 400 }]
-        : undefined,
-    },
+
+      <div style={{ display: "flex", flexDirection: "column", fontFamily: "Unbounded" }}>
+        {name
+          .toUpperCase()
+          .split(" ")
+          .map((word, index, words) => (
+            <div
+              key={word}
+              style={{
+                display: "flex",
+                alignItems: "flex-end",
+                fontSize: 150,
+                lineHeight: 0.95,
+                letterSpacing: -5,
+              }}
+            >
+              {word}
+              {index === words.length - 1 ? (
+                <div
+                  style={{
+                    width: 62,
+                    height: 106,
+                    backgroundColor: "#2531e0",
+                    marginLeft: 14,
+                    marginBottom: 12,
+                  }}
+                />
+              ) : null}
+            </div>
+          ))}
+      </div>
+
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          fontSize: 19,
+          color: "#42454a",
+          borderTop: "1px solid #cdd0d1",
+          paddingTop: 18,
+        }}
+      >
+        <div>{stack}</div>
+        <div>{handle}</div>
+      </div>
+    </div>,
+    { ...size, fonts: fonts.length ? fonts : undefined },
   );
 }

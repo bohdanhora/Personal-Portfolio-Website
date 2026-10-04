@@ -6,20 +6,21 @@ import { Experience } from "@/components/sections/Experience";
 import { Hero } from "@/components/sections/Hero";
 import { SelectedWork } from "@/components/sections/SelectedWork";
 import { Skills } from "@/components/sections/Skills";
+import type { Locale } from "@/types";
 
-export default function HomePage() {
+export function HomePage({ locale }: { locale: Locale }) {
   return (
-    <>
+    <div className="sheet">
       <main id="main">
-        <Hero />
-        <About />
-        <Experience />
-        <SelectedWork />
-        <Skills />
-        <Approach />
-        <Contact />
+        <Hero locale={locale} />
+        <About locale={locale} />
+        <Experience locale={locale} />
+        <SelectedWork locale={locale} />
+        <Skills locale={locale} />
+        <Approach locale={locale} />
+        <Contact locale={locale} />
       </main>
-      <SiteFooter />
-    </>
+      <SiteFooter locale={locale} />
+    </div>
   );
 }

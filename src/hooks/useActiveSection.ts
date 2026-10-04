@@ -2,11 +2,6 @@
 
 import { useEffect, useState } from "react";
 
-/**
- * Tracks which section is currently in the reading area of the viewport.
- * Uses a band across the upper middle of the screen so the highlight changes
- * when a section actually becomes the thing you are reading.
- */
 export function useActiveSection(ids: string[]): string | null {
   const [active, setActive] = useState<string | null>(null);
 

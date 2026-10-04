@@ -1,20 +1,29 @@
-import { approach } from "@/data/approach";
-import { Reveal } from "@/components/ui/Reveal";
 import { Section } from "@/components/ui/Section";
+import { approach } from "@/data/approach";
+import { dictionaries } from "@/data/dictionary";
+import { t } from "@/lib/i18n";
+import type { Locale } from "@/types";
 
-export function Approach() {
+export function Approach({ locale }: { locale: Locale }) {
   return (
-    <Section id="approach" index="05" title="Approach">
-      <div className="grid gap-x-12 gap-y-10 sm:grid-cols-2">
+    <Section id="approach" index="05" title={dictionaries[locale].sections.approach}>
+      <ol className="grid gap-x-10 sm:grid-cols-2">
         {approach.map((item, index) => (
-          <Reveal key={item.title} delay={0.05 * (index % 2)}>
-            <article className="border-t border-rule pt-5">
-              <h3 className="font-serif text-lg leading-snug tracking-tight">{item.title}</h3>
-              <p className="mt-3 text-[0.9375rem] leading-relaxed text-ink-muted">{item.body}</p>
-            </article>
-          </Reveal>
+          <li key={t(item.title, "en")} className="border-t border-rule-strong py-6">
+            <div className="flex gap-4">
+              <span aria-hidden className="w-5 shrink-0 font-mono text-xs leading-7 text-accent">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h3 className="text-lg font-semibold leading-snug">{t(item.title, locale)}</h3>
+                <p className="mt-2 text-body leading-relaxed text-ink-muted">
+                  {t(item.body, locale)}
+                </p>
+              </div>
+            </div>
+          </li>
         ))}
-      </div>
+      </ol>
     </Section>
   );
 }

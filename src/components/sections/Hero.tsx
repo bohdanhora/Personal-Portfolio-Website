@@ -1,111 +1,98 @@
-"use client";
-
-import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { useRef } from "react";
 import { DownloadCv } from "@/components/ui/DownloadCv";
+import { KyivClock } from "@/components/ui/KyivClock";
+import { SpecTable } from "@/components/ui/SpecTable";
+import { TypedHeadline } from "@/components/ui/TypedHeadline";
+import { dictionaries } from "@/data/dictionary";
 import { profile } from "@/data/profile";
+import { t } from "@/lib/i18n";
+import type { Locale } from "@/types";
 
-const nameWords = profile.name.split(" ");
+export function Hero({ locale }: { locale: Locale }) {
+  const dict = dictionaries[locale];
+  const name = t(profile.name, locale);
+  const [first = "", last = ""] = name.split(" ");
 
-const links = [
-  { label: profile.links.linkedin.label, href: profile.links.linkedin.href, external: true },
-  { label: profile.links.github.label, href: profile.links.github.href, external: true },
-  { label: "Email", href: `mailto:${profile.email}`, external: false },
-];
+  const links = [
+    { label: profile.links.linkedin.label, href: profile.links.linkedin.href, external: true },
+    { label: profile.links.github.label, href: profile.links.github.href, external: true },
+    { label: profile.links.telegram.label, href: profile.links.telegram.href, external: true },
+    { label: dict.email, href: `mailto:${profile.email}`, external: false },
+  ];
 
-/**
- * The entrance is done with CSS animations so the first screen always settles,
- * even if the animation frame loop is paused. Only the parallax, which is an
- * enhancement and defaults to no offset, runs through Motion.
- */
-export function Hero() {
-  const ref = useRef<HTMLElement>(null);
-  const reduced = useReducedMotion();
-
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end start"],
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], [0, 72]);
-  const opacity = useTransform(scrollYProgress, [0, 0.85], [1, 0]);
+  const rows = [
+    { key: dict.position, value: t(profile.position, locale) },
+    { key: dict.stack, value: "TypeScript · React · Next.js · NestJS · PostgreSQL" },
+    { key: dict.location, value: t(profile.location, locale) },
+    {
+      key: dict.status,
+      value: (
+        <span className="inline-flex items-center gap-2">
+          <span aria-hidden className="h-2 w-2 bg-accent" />
+          {t(profile.availability, locale)}
+        </span>
+      ),
+    },
+    {
+      key: dict.languages,
+      value: profile.languages
+        .map((language) => `${t(language.name, locale)} ${t(language.level, locale).split(",")[0]}`)
+        .join(" · "),
+    },
+  ];
 
   return (
-    <section id="top" ref={ref} className="relative flex min-h-[92svh] items-center pt-28 pb-20">
-      <motion.div className="shell w-full" style={reduced ? undefined : { y, opacity }}>
-        <div className="animate-fade-up flex items-center gap-4">
-          <span aria-hidden className="h-px w-10 bg-accent" />
-          <p className="label">{profile.title}</p>
-        </div>
-
-        <h1 className="mt-6 font-serif text-[clamp(3.25rem,11vw,8.5rem)] leading-[0.9] tracking-[-0.035em]">
-          {nameWords.map((word, index) => (
-            <span
-              key={word}
-              className="mr-[0.22em] inline-block overflow-hidden pb-[0.06em] last:mr-0"
-            >
-              <span
-                className="animate-rise inline-block"
-                style={{ animationDelay: `${0.08 + index * 0.09}s` }}
-              >
-                {word}
+    <section id="top" className="pt-24 pb-16 md:pt-28 md:pb-24">
+      <div className="shell">
+        <div className="md:px-6">
+          <div className="animate-fade-up flex flex-wrap items-center justify-between gap-x-6 gap-y-2 border-y border-rule-strong py-2.5">
+            <p className="label text-ink">{profile.title}</p>
+            <p className="label">
+              {dict.localTime}{" "}
+              <span className="text-ink">
+                <KyivClock />
               </span>
-            </span>
-          ))}
-        </h1>
+            </p>
+          </div>
 
-        <div
-          className="animate-fade-up mt-12 grid gap-10 md:mt-16 md:grid-cols-12"
-          style={{ animationDelay: "0.45s" }}
-        >
-          <p className="max-w-2xl text-xl leading-relaxed md:col-span-7 md:text-[1.5rem] md:leading-[1.45]">
-            {profile.intro[0]} <span className="text-ink-muted">{profile.intro[1]}</span>
-          </p>
+          <h1
+            className="animate-fade-up mt-10 font-display text-hero font-semibold uppercase md:mt-14"
+            style={{ animationDelay: "0.08s" }}
+          >
+            <span className="sr-only">{name}</span>
+            <TypedHeadline phrases={[[first, last], ...dict.headline]} />
+          </h1>
 
-          <dl className="divide-y divide-rule self-end border-t border-rule md:col-span-4 md:col-start-9">
-            <div className="py-4">
-              <dt className="label">Based in</dt>
-              <dd className="mt-2 text-[0.9375rem] text-ink">{profile.location}</dd>
+          <div
+            className="animate-fade-up mt-12 grid gap-10 md:mt-16 md:grid-cols-12"
+            style={{ animationDelay: "0.2s" }}
+          >
+            <div className="md:col-span-6">
+              <p className="text-xl font-medium leading-snug md:text-2xl">
+                {t(profile.intro[0] ?? "", locale)}{" "}
+                <span className="text-ink-muted">{t(profile.intro[1] ?? "", locale)}</span>
+              </p>
+
+              <div className="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+                <DownloadCv locale={locale} />
+                <ul className="flex flex-wrap items-center gap-x-5 gap-y-2 font-mono text-xs uppercase">
+                  {links.map((link) => (
+                    <li key={link.label}>
+                      <a
+                        href={link.href}
+                        {...(link.external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
+                        className="link"
+                      >
+                        {link.label}
+                        {link.external ? <span aria-hidden> ↗</span> : null}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
-            <div className="py-4">
-              <dt className="label">Status</dt>
-              <dd className="mt-2 text-[0.9375rem] leading-snug text-ink">
-                {profile.availability}
-              </dd>
-            </div>
-          </dl>
-        </div>
 
-        <div
-          className="animate-fade-up mt-12 flex flex-wrap items-center gap-x-10 gap-y-5"
-          style={{ animationDelay: "0.6s" }}
-        >
-          <DownloadCv />
-
-          <ul className="flex flex-wrap items-center gap-x-8 gap-y-3">
-            {links.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  {...(link.external ? { target: "_blank", rel: "noreferrer noopener" } : {})}
-                  className="link-underline text-sm text-ink transition-colors hover:text-accent"
-                >
-                  {link.label}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </motion.div>
-
-      <div
-        aria-hidden
-        className="animate-fade-up absolute bottom-8 left-0 hidden w-full md:block"
-        style={{ animationDelay: "0.9s" }}
-      >
-        <div className="shell flex items-center gap-4">
-          <span className="h-px w-16 bg-rule-strong" />
-          <span className="label">Scroll</span>
+            <SpecTable rows={rows} className="md:col-span-6 md:col-start-7 md:self-end" />
+          </div>
         </div>
       </div>
     </section>

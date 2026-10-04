@@ -1,63 +1,112 @@
-import { projects } from "@/data/projects";
-import { Reveal } from "@/components/ui/Reveal";
 import { Section } from "@/components/ui/Section";
 import { TechList } from "@/components/ui/TechList";
+import { dictionaries } from "@/data/dictionary";
+import { projects } from "@/data/projects";
+import { t } from "@/lib/i18n";
+import type { Locale, Project } from "@/types";
 
-export function SelectedWork() {
+function ProjectCell({
+  project,
+  code,
+  locale,
+}: {
+  project: Project;
+  code: string;
+  locale: Locale;
+}) {
   return (
-    <Section id="work" index="03" title="Selected work">
-      <Reveal>
-        <p className="max-w-xl text-[0.9375rem] leading-relaxed text-ink-muted">
-          Most of this is client work under NDA, so the descriptions stay at the level of the
-          problem and the engineering rather than the product behind it.
-        </p>
-      </Reveal>
+    <article className="flex flex-col border-b border-r border-rule-strong p-5 md:p-7 lg:last:odd:col-span-2">
+      <div className="flex items-baseline justify-between gap-4">
+        <span className="shrink-0 font-mono text-xs text-accent">{code}</span>
+        <span className="label text-right">
+          {t(project.kind, locale)} · {t(project.period, locale)}
+        </span>
+      </div>
 
-      <ol className="mt-10">
-        {projects.map((project, index) => (
-          <li key={project.title}>
-            <Reveal as="article" className="border-t border-rule py-9 md:py-12">
-              <div className="grid gap-x-8 gap-y-4 md:grid-cols-12">
-                <div className="flex items-baseline gap-4 md:col-span-3 md:block">
-                  <span aria-hidden className="font-serif text-3xl leading-none text-ink-faint">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
-                  <div className="md:mt-4">
-                    <p className="text-[0.8125rem] text-ink-faint">{project.kind}</p>
-                    <p className="text-[0.8125rem] text-ink-faint">{project.period}</p>
-                  </div>
-                </div>
+      <h4 className="mt-6 font-display text-xl font-medium leading-tight tracking-tight md:text-2xl">
+        {t(project.title, locale)}
+      </h4>
+      <p className="mt-4 text-body leading-relaxed text-ink-muted">{t(project.summary, locale)}</p>
 
-                <div className="md:col-span-9">
-                  <h3 className="font-serif text-[1.75rem] leading-tight tracking-tight md:text-[2.125rem]">
-                    {project.title}
-                  </h3>
-                  <p className="mt-4 text-base leading-relaxed text-ink-muted">{project.summary}</p>
+      <TechList items={project.tech} className="mt-5" />
 
-                  <TechList items={project.tech} className="mt-6" />
+      {project.links ? (
+        <ul className="mt-auto flex flex-wrap gap-2 pt-6">
+          {project.links.map((link, index) => (
+            <li key={link.href}>
+              <a
+                href={link.href}
+                target="_blank"
+                rel="noreferrer noopener"
+                className={index === 0 ? "btn py-2" : "btn btn-outline py-2"}
+              >
+                {t(link.label, locale)}
+                <span aria-hidden>↗</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </article>
+  );
+}
 
-                  {project.links ? (
-                    <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-2">
-                      {project.links.map((link) => (
-                        <li key={link.href}>
-                          <a
-                            href={link.href}
-                            target="_blank"
-                            rel="noreferrer noopener"
-                            className="link-underline text-sm text-ink transition-colors hover:text-accent"
-                          >
-                            {link.label}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  ) : null}
-                </div>
-              </div>
-            </Reveal>
-          </li>
+function ProjectGroup({
+  title,
+  note,
+  items,
+  prefix,
+  locale,
+}: {
+  title: string;
+  note: string;
+  items: Project[];
+  prefix: string;
+  locale: Locale;
+}) {
+  return (
+    <div>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
+        <h3 className="label text-ink">{title}</h3>
+        <p className="label">{String(items.length).padStart(2, "0")}</p>
+      </div>
+      <p className="mt-3 max-w-2xl text-body leading-relaxed text-ink-muted">{note}</p>
+
+      <div className="mt-6 grid border-l border-t border-rule-strong lg:grid-cols-2">
+        {items.map((project, index) => (
+          <ProjectCell
+            key={t(project.title, "en")}
+            project={project}
+            code={`${prefix}-${String(index + 1).padStart(2, "0")}`}
+            locale={locale}
+          />
         ))}
-      </ol>
+      </div>
+    </div>
+  );
+}
+
+export function SelectedWork({ locale }: { locale: Locale }) {
+  const dict = dictionaries[locale];
+
+  return (
+    <Section id="work" index="03" title={dict.sections.work}>
+      <div className="space-y-16">
+        <ProjectGroup
+          title={dict.personalWork}
+          note={dict.personalWorkNote}
+          items={projects.filter((project) => project.personal)}
+          prefix="P"
+          locale={locale}
+        />
+        <ProjectGroup
+          title={dict.clientWork}
+          note={dict.clientWorkNote}
+          items={projects.filter((project) => !project.personal)}
+          prefix="C"
+          locale={locale}
+        />
+      </div>
     </Section>
   );
 }

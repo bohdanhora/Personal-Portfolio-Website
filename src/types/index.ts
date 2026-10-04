@@ -1,6 +1,10 @@
+export type Locale = "en" | "uk" | "ru";
+
+export type Localized = string | Record<Locale, string>;
+
 export type NavItem = {
   id: string;
-  label: string;
+  label: Localized;
 };
 
 export type SocialLink = {
@@ -10,71 +14,94 @@ export type SocialLink = {
 };
 
 export type Fact = {
-  label: string;
-  value: string;
+  label: Localized;
+  value: Localized;
+};
+
+export type Phone = {
+  display: string;
+  href: string;
+  messengers: string[];
+};
+
+export type Language = {
+  name: Localized;
+  level: Localized;
 };
 
 export type Profile = {
-  name: string;
+  name: Localized;
   title: string;
-  location: string;
-  availability: string;
-  intro: string[];
-  about: string[];
+  position: Localized;
+  location: Localized;
+  availability: Localized;
+  intro: Localized[];
+  about: Localized[];
   facts: Fact[];
   email: string;
+  phone?: Phone;
+  languages: Language[];
   links: {
     linkedin: SocialLink;
     github: SocialLink;
+    telegram: SocialLink;
   };
 };
 
 export type Role = {
   title: string;
-  period: string;
+  period: Localized;
   start: string;
   end: string;
-  summary: string;
-  focus?: string[];
+  summary: Localized;
+  duties: Localized[];
   tech: string[];
 };
 
 export type Company = {
-  name: string;
-  period: string;
-  location: string;
-  arrangement: string;
+  name: Localized;
+  period: Localized;
+  location: Localized;
+  arrangement: Localized;
   roles: Role[];
 };
 
 export type Education = {
-  institution: string;
-  qualification: string;
-  field: string;
-  period: string;
-  note: string;
+  institution: Localized;
+  qualification: Localized;
+  field: Localized;
+  period: Localized;
+  note: Localized;
+};
+
+export type Course = {
+  title: Localized;
+  provider: string;
+  period: Localized;
+  note: Localized;
 };
 
 export type ProjectLink = {
-  label: string;
+  label: Localized;
   href: string;
 };
 
 export type Project = {
-  title: string;
-  kind: string;
-  period: string;
-  summary: string;
+  title: Localized;
+  kind: Localized;
+  period: Localized;
+  summary: Localized;
   tech: string[];
+  personal?: boolean;
   links?: ProjectLink[];
 };
 
 export type SkillGroup = {
-  title: string;
-  items: string[];
+  title: Localized;
+  items: Localized[];
 };
 
 export type ApproachItem = {
-  title: string;
-  body: string;
+  title: Localized;
+  body: Localized;
 };

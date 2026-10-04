@@ -1,58 +1,94 @@
 import { DownloadCv } from "@/components/ui/DownloadCv";
-import { profile } from "@/data/profile";
-import { Reveal } from "@/components/ui/Reveal";
 import { Section } from "@/components/ui/Section";
+import { SpecTable, type SpecRow } from "@/components/ui/SpecTable";
+import { dictionaries } from "@/data/dictionary";
+import { profile } from "@/data/profile";
+import { t } from "@/lib/i18n";
+import type { Locale } from "@/types";
 
-export function Contact() {
-  const channels = [
-    { label: "LinkedIn", value: profile.links.linkedin.handle, href: profile.links.linkedin.href },
-    { label: "GitHub", value: profile.links.github.handle, href: profile.links.github.href },
+function ExternalLink({ href, children }: { href: string; children: string }) {
+  return (
+    <a href={href} target="_blank" rel="noreferrer noopener" className="link">
+      {children}
+    </a>
+  );
+}
+
+function Email() {
+  const [user, domain] = profile.email.split("@");
+  return (
+    <>
+      {user}@<wbr />
+      {domain}
+    </>
+  );
+}
+
+export function Contact({ locale }: { locale: Locale }) {
+  const dict = dictionaries[locale];
+  const { phone, links } = profile;
+
+  const rows: SpecRow[] = [
+    {
+      key: dict.email,
+      value: (
+        <a href={`mailto:${profile.email}`} className="link">
+          <Email />
+        </a>
+      ),
+    },
+    ...(phone
+      ? [
+          {
+            key: dict.phone,
+            value: (
+              <>
+                <a href={phone.href} className="link">
+                  {phone.display}
+                </a>
+                {phone.messengers.length ? (
+                  <span className="text-ink-faint"> · {phone.messengers.join(", ")}</span>
+                ) : null}
+              </>
+            ),
+          },
+        ]
+      : []),
+    {
+      key: links.linkedin.label,
+      value: <ExternalLink href={links.linkedin.href}>{links.linkedin.handle}</ExternalLink>,
+    },
+    {
+      key: links.github.label,
+      value: <ExternalLink href={links.github.href}>{links.github.handle}</ExternalLink>,
+    },
+    {
+      key: links.telegram.label,
+      value: <ExternalLink href={links.telegram.href}>{links.telegram.handle}</ExternalLink>,
+    },
+    { key: dict.location, value: t(profile.location, locale) },
   ];
 
   return (
-    <Section id="contact" index="06" title="Contact">
-      <Reveal>
-        <p className="max-w-xl font-serif text-2xl leading-snug md:text-[2rem] md:leading-[1.25]">
-          {profile.availability}. Email is the quickest way to reach me.
-        </p>
-      </Reveal>
+    <Section id="contact" index="06" title={dict.sections.contact}>
+      <p className="max-w-2xl text-xl font-medium leading-snug md:text-2xl">
+        {t(profile.availability, locale)}.{" "}
+        <span className="text-ink-muted">{dict.contactLead}</span>
+      </p>
 
-      <Reveal delay={0.06}>
-        <a
-          href={`mailto:${profile.email}`}
-          className="link-underline mt-9 inline-block font-serif text-[clamp(1.4rem,4.6vw,2.75rem)] leading-none tracking-tight transition-colors hover:text-accent"
-        >
-          {profile.email}
-        </a>
-      </Reveal>
+      <a
+        href={`mailto:${profile.email}`}
+        className="mt-10 block font-display text-email font-medium leading-tight tracking-tight decoration-accent decoration-2 underline-offset-4 hover:underline"
+      >
+        <Email />
+      </a>
 
-      <Reveal delay={0.1}>
-        <DownloadCv className="mt-10" />
-      </Reveal>
-
-      <Reveal delay={0.14}>
-        <dl className="mt-14 grid gap-8 border-t border-rule pt-8 sm:grid-cols-3">
-          {channels.map((channel) => (
-            <div key={channel.label}>
-              <dt className="label">{channel.label}</dt>
-              <dd className="mt-2">
-                <a
-                  href={channel.href}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="link-underline text-[0.9375rem] text-ink transition-colors hover:text-accent"
-                >
-                  {channel.value}
-                </a>
-              </dd>
-            </div>
-          ))}
-          <div>
-            <dt className="label">Location</dt>
-            <dd className="mt-2 text-[0.9375rem] text-ink-muted">{profile.location}</dd>
-          </div>
-        </dl>
-      </Reveal>
+      <div className="mt-12 grid gap-10 lg:grid-cols-9">
+        <SpecTable rows={rows} className="lg:col-span-6" />
+        <div className="lg:col-span-3 lg:self-end">
+          <DownloadCv locale={locale} />
+        </div>
+      </div>
     </Section>
   );
 }
