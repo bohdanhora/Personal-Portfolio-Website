@@ -2,130 +2,75 @@
 
 # Bohdan Hora
 
-**Personal portfolio site of a full-stack software engineer working with TypeScript across frontend and backend.**
+**Full-Stack Software Engineer. TypeScript on both sides of the API.**
 
-[![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)](https://nextjs.org/)
-[![React](https://img.shields.io/badge/React-19-149ECA?logo=react&logoColor=white)](https://react.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
-
-[LinkedIn](https://www.linkedin.com/in/bohdan-hora/) · [GitHub](https://github.com/bohdanhora)
+[LinkedIn](https://www.linkedin.com/in/bohdan-hora/) · [GitHub](https://github.com/bohdanhora) · [Telegram](https://t.me/cocobohd) · [bohdan.hora.developer@gmail.com](mailto:bohdan.hora.developer@gmail.com)
 
 </div>
 
-## Overview
+This is the source of my personal site: a one-page CV that also hands out a PDF version of itself
+in English, Ukrainian and Russian.
 
-A single-page portfolio that gives a recruiter or an engineering manager a clear picture of my
-background in about two minutes: what I work on, which systems I have built, how my career moved
-from Vue and React frontends into backend and full-stack work, and how to reach me.
+## About me
 
-The site is frontend only. There is no backend, database or CMS. All content lives in typed files
-under `src/data`, which keeps copy separate from presentation and makes updates a one-file change.
+I came into frontend through Vue in 2021 and have been moving down the stack since. These days I
+write more backend than frontend: NestJS and Fastify services on PostgreSQL and Redis, with React
+and Next.js on the other side. I live in Ukraine and work remotely at Computools.
 
-## Sections
-
-| Section | What it covers |
+| | |
 | --- | --- |
-| Hero | Name, title and a two-line summary of what I actually do |
-| About | Career direction and current focus |
-| Experience | Timeline of roles by company, with scope and technologies |
-| Selected work | Five products described at the level of the engineering problem |
-| Skills | Technologies grouped by area, only ones I have used in practice |
-| Approach | How I work on a team and in existing codebases |
-| Contact | Email, LinkedIn and GitHub, plus the CV download |
+| Position | Full-Stack Engineer (TypeScript, React, Node.js) |
+| Commercial since | 2022 |
+| Core stack | TypeScript, React, Next.js, NestJS, Fastify, PostgreSQL, Redis, MongoDB |
+| Also | React Native (basics) |
+| Beyond code | Task writing and estimates in Jira, Linear, Notion, Asana and Confluence; team budgeting, time reporting, business model design, running a project from idea to release |
+| Languages | Ukrainian (native), English (B2), Russian (fluent) |
+| Open to | Full-stack, frontend and backend roles |
 
-## Tech stack
+### Personal projects
 
-| Area | Technology |
-| --- | --- |
-| Framework | Next.js 16 App Router, React 19, TypeScript |
-| Styling | Tailwind CSS 4 with a small token layer in `globals.css` |
-| Animation | Motion, with full `prefers-reduced-motion` support |
-| Typography | Newsreader, Inter and JetBrains Mono through `next/font` |
-| Metadata | Next.js Metadata API, generated Open Graph image, sitemap, robots, JSON-LD |
-| CV | pdfmake, at build time only |
-| Tooling | ESLint, Prettier, TypeScript in strict mode |
+| Project | What it is | Links |
+| --- | --- | --- |
+| SkinScout | Market scanner for CS2 skins across five marketplaces: price spreads after fees, float and pattern finds, inventory valuation | [Live](https://skins-front-production.up.railway.app) · [Front](https://github.com/bohdanhora/skins-front) · [Back](https://github.com/bohdanhora/skins-back) |
+| Sport Calorie | Calorie and fitness tracker with routines, a weekly plan and photo-based food entries | [Live](https://sport-calorie.vercel.app) · [Front](https://github.com/bohdanhora/sport-calorie) · [Back](https://github.com/bohdanhora/sport-calorie-back) |
+| Finance | Personal finance app: budgets, savings goals, multi-currency balances, PDF reports | [Live](https://finance-front-zeta.vercel.app) · [Front](https://github.com/bohdanhora/finance-front) · [Back](https://github.com/bohdanhora/finance-backend) |
 
-Nothing ships to the browser beyond that. The whole page is prerendered as static content.
+## About this site
 
-## Getting started
+- **One source of truth.** All copy lives in typed files under `src/data`. The page and the CV PDFs
+  are both built from them, so they never disagree.
+- **Three languages.** English at `/` by default, Ukrainian at `/uk`, Russian at `/ru`. Translated
+  text sits inline as `{ en, uk, ru }`, and `t(value, locale)` in `src/lib/i18n.ts` picks it.
+- **CV on build.** `npm run cv` typesets `public/bohdan-hora-cv.pdf`, `-uk.pdf` and `-ru.pdf` with
+  pdfmake in the site's own fonts. It runs before every production build.
+- **Static.** No backend, database or CMS. Every page is prerendered.
+- **NDA-safe.** Client and product names are left out on purpose. Commercial work is described by
+  product type and engineering scope only.
+
+Built with Next.js 16, React 19, TypeScript, Tailwind CSS 4 and Motion. Set in Unbounded, IBM Plex
+Sans and Martian Mono.
+
+## Running it
 
 Requires Node.js 20 or newer.
 
 ```bash
 npm install
-npm run dev
+npm run dev      # http://localhost:3000
+npm run cv       # rebuild the three CV PDFs
+npm run build    # production build, regenerates the CV first
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+`npm run lint`, `npm run typecheck` and `npm run format` keep the code in shape.
 
-## Scripts
+## Updating content
 
-| Command | Description |
+| What | Where |
 | --- | --- |
-| `npm run dev` | Start the development server |
-| `npm run cv` | Rebuild the CV PDF from `src/data` |
-| `npm run build` | Create the production build, regenerating the CV first |
-| `npm run start` | Serve the production build |
-| `npm run lint` | Run ESLint |
-| `npm run typecheck` | Run the TypeScript compiler without emitting |
-| `npm run format` | Format `src` with Prettier |
+| Name, position, contacts, phone, languages | `src/data/profile.ts` |
+| Jobs, education, courses | `src/data/experience.ts` |
+| Projects | `src/data/projects.ts` |
+| Skills | `src/data/skills.ts` |
+| Headings, buttons, labels | `src/data/dictionary.ts` |
 
-## Project structure
-
-```text
-scripts/          CV generator, run through `npm run cv`
-src/
-  app/            Root layout, page, metadata, sitemap, robots, Open Graph image
-  components/
-    layout/       Header with scroll-aware navigation, footer
-    sections/     One component per page section
-    ui/           Section shell, reveal and list primitives
-  data/           All site content: profile, experience, projects, skills, approach
-  hooks/          Active section tracking, scroll position
-  lib/            Shared motion variants and helpers
-  types/          Shapes for the content files
-```
-
-Editing content means editing `src/data`. Components read from it and never hold copy of their own.
-
-## CV
-
-The downloadable CV is not a separate document. `npm run cv` reads the same files under
-`src/data` and typesets them into `public/bohdan-hora-cv.pdf` with pdfmake, using the site's
-own faces and accent colour so the two match. It runs automatically before every production
-build, so editing the content is enough to update both the page and the PDF.
-
-If the fonts cannot be downloaded during a build, the script leaves the committed PDF in place
-rather than failing.
-
-## Deployment
-
-Set `NEXT_PUBLIC_SITE_URL` to the deployed origin so canonical URLs, the sitemap and Open Graph
-tags point at the right place. On Vercel the production URL is picked up automatically if the
-variable is not set.
-
-```dotenv
-NEXT_PUBLIC_SITE_URL=https://your-domain
-```
-
-## Content and NDA
-
-Most of my commercial work is under NDA. Client and product names are left out on purpose, and
-projects are described by the type of product, the engineering problems involved and my part in
-solving them. No internal metrics, architecture details or business information appear anywhere on
-the site.
-
-## Design and accessibility
-
-The layout is built around typography and spacing rather than effects: a warm paper palette, one
-restrained accent, and a light and dark theme that follows the system setting. Animation is used
-to guide attention and is fully removed when the visitor asks for reduced motion. Navigation is
-keyboard accessible with visible focus states, and body text meets WCAG AA contrast in both themes.
-
-## Author
-
-**Bohdan Hora**
-
-- GitHub: [bohdanhora](https://github.com/bohdanhora)
-- LinkedIn: [in/bohdan-hora](https://www.linkedin.com/in/bohdan-hora/)
+A phone number added to `profile.phone` appears on the site and in every CV.
