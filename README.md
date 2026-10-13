@@ -31,6 +31,7 @@ and Next.js on the other side. I live in Ukraine and work remotely at Computools
 
 | Project | What it is | Links |
 | --- | --- | --- |
+| Personal Planner | Daily planner for work and life with drag and drop, projects, insights and an assistant on your own AI key | [Live](https://personal-planner-production-93b2.up.railway.app) · [Front](https://github.com/bohdanhora/personal-planner) · [Back](https://github.com/bohdanhora/personal-planner-back) |
 | SkinScout | Market scanner for CS2 skins across five marketplaces: price spreads after fees, float and pattern finds, inventory valuation | [Live](https://skins-front-production.up.railway.app) · [Front](https://github.com/bohdanhora/skins-front) · [Back](https://github.com/bohdanhora/skins-back) |
 | Sport Calorie | Calorie and fitness tracker with routines, a weekly plan and photo-based food entries | [Live](https://sport-calorie.vercel.app) · [Front](https://github.com/bohdanhora/sport-calorie) · [Back](https://github.com/bohdanhora/sport-calorie-back) |
 | Finance | Personal finance app: budgets, savings goals, multi-currency balances, PDF reports | [Live](https://finance-front-zeta.vercel.app) · [Front](https://github.com/bohdanhora/finance-front) · [Back](https://github.com/bohdanhora/finance-backend) |
